@@ -1,0 +1,872 @@
+1. table creation purpose (as detail as possible)
+    Store history and MVP requirements for seller rating.
+
+    2. Deployment date (as detail as possible)
+    2016.12.8
+
+    3. Target Database : Server name / IP (ex. cart / 10.10.10.xxx)
+    seller-rating-mdb01-mp 10.10.11.71
+    seller-rating-mdb02-mp 10.10.11.72
+    Database Service VIP : 10.10.11.205
+
+    4. Need to add Table Comment & Column Comment ,테이블 생성 구문 (Table CREATE query)
+
+    ALTER TABLE `seller_rating`.`cancellation_history`
+    ADD COLUMN `cancelUnit` bigint(20) NOT NULL COMMENT 'totalCancelUnit for cancellation',
+    ADD COLUMN `soldUnit` bigint(20) NOT NULL COMMENT 'soldUnit for cancellation';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`cancellation_history` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for cancellation',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for cancellation',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for cancellation',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for cancellation',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for cancellation',
+    `last7DaysCancelUnit` bigint(20) NOT NULL COMMENT 'last7DaysCancelUnit for cancellation',
+    `lastMonthCancelUnit` bigint(20) NOT NULL COMMENT 'lastMonthCancelUnit for cancellation',
+    `last3MonthCancelUnit` bigint(20) NOT NULL COMMENT 'last3MonthCancelUnit for cancellation',
+    `last12MonthCancelUnit` bigint(20) NOT NULL COMMENT 'last12MonthCancelUnit for cancellation',
+    `last7DaysSoldUnit` bigint(20) NOT NULL COMMENT 'last7DaysSoldUnit for cancellation',
+    `lastMonthSoldUnit` bigint(20) NOT NULL COMMENT 'lastMonthSoldUnit for cancellation',
+    `last3MonthSoldUnit` bigint(20) NOT NULL COMMENT 'last3MonthSoldUnit for cancellation',
+    `last12MonthSoldUnit` bigint(20) NOT NULL COMMENT 'last12MonthSoldUnit for cancellation',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`id`,`rateDate`),
+    UNIQUE KEY `cancellation_history_uk01` (`vendorId`,`rateDate`),
+    KEY `cancellation_history_idx01` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors'
+    /*!50500 PARTITION BY RANGE COLUMNS(rateDate)
+    (PARTITION p201609 VALUES LESS THAN ('2016-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201610 VALUES LESS THAN ('2016-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201611 VALUES LESS THAN ('2016-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201612 VALUES LESS THAN ('2017-01-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201701 VALUES LESS THAN ('2017-02-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201702 VALUES LESS THAN ('2017-03-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201703 VALUES LESS THAN ('2017-04-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201704 VALUES LESS THAN ('2017-05-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201705 VALUES LESS THAN ('2017-06-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201706 VALUES LESS THAN ('2017-07-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201707 VALUES LESS THAN ('2017-08-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201708 VALUES LESS THAN ('2017-09-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201709 VALUES LESS THAN ('2017-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201710 VALUES LESS THAN ('2017-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201711 VALUES LESS THAN ('2017-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201712 VALUES LESS THAN ('2018-01-01 00:00:00') ENGINE = InnoDB) */
+    ;
+
+    ALTER TABLE `seller_rating`.`deliverynps_history`
+    ADD COLUMN `positiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 9~10',
+    ADD COLUMN `neutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count from 7~8',
+    ADD COLUMN `negativeCount` bigint(20) NOT NULL COMMENT 'negativeCount : count from 0~6',
+    ADD COLUMN `totalCount` bigint(20) NOT NULL COMMENT 'last7DaysTotalCount for deliverynps';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`deliverynps_history` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for deliverynps',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for deliverynps',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for deliverynps',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for deliverynps',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for deliverynps',
+    `last7DaysPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 9~10',
+    `lastMonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 9~10',
+    `last3MonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 9~10',
+    `last12MonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 9~10',
+    `last7DaysNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count from 7~8',
+    `lastMonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count from 7~8',
+    `last3MonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count from 7~8',
+    `last12MonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count from 7~8',
+    `last7DaysNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 0~6',
+    `lastMonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 0~6',
+    `last3MonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 0~6',
+    `last12MonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 0~6',
+    `last7DaysTotalCount` bigint(20) NOT NULL COMMENT 'last7DaysTotalCount for deliverynps',
+    `lastMonthTotalCount` bigint(20) NOT NULL COMMENT 'lastMonthTotalCount for deliverynps',
+    `last3MonthTotalCount` bigint(20) NOT NULL COMMENT 'last3MonthTotalCount for deliverynps',
+    `last12MonthTotalCount` bigint(20) NOT NULL COMMENT 'last12MonthTotalCount for deliverynps',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`id`,`rateDate`),
+    UNIQUE KEY `deliverynps_history_uk01` (`vendorId`,`rateDate`),
+    KEY `deliverynps_history_idx01` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors'
+    /*!50500 PARTITION BY RANGE COLUMNS(rateDate)
+    (PARTITION p201609 VALUES LESS THAN ('2016-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201610 VALUES LESS THAN ('2016-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201611 VALUES LESS THAN ('2016-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201612 VALUES LESS THAN ('2017-01-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201701 VALUES LESS THAN ('2017-02-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201702 VALUES LESS THAN ('2017-03-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201703 VALUES LESS THAN ('2017-04-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201704 VALUES LESS THAN ('2017-05-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201705 VALUES LESS THAN ('2017-06-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201706 VALUES LESS THAN ('2017-07-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201707 VALUES LESS THAN ('2017-08-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201708 VALUES LESS THAN ('2017-09-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201709 VALUES LESS THAN ('2017-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201710 VALUES LESS THAN ('2017-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201711 VALUES LESS THAN ('2017-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201712 VALUES LESS THAN ('2018-01-01 00:00:00') ENGINE = InnoDB) */
+    ;
+
+    ALTER TABLE `seller_rating`.`customer_feedback_history`
+    ADD COLUMN `positiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 4~5',
+    ADD COLUMN `neutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count 3',
+    ADD COLUMN `negativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 1~2',
+    ADD COLUMN `totalCount` bigint(20) NOT NULL COMMENT 'last7DaysTotalCount for customer_feedback';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`customer_feedback_history` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for customer_feedback',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for customer_feedback',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for customer_feedback',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for customer_feedback',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for customer_feedback',
+    `last7DaysPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 4~5',
+    `lastMonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 4~5',
+    `last3MonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 4~5',
+    `last12MonthPositiveCount` bigint(20) NOT NULL COMMENT 'positiveCount : count from 4~5',
+    `last7DaysNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count 3',
+    `lastMonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count 3',
+    `last3MonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count 3',
+    `last12MonthNeutralCount` bigint(20) NOT NULL COMMENT 'neutralCount : count 3',
+    `last7DaysNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 1~2',
+    `lastMonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 1~2',
+    `last3MonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 1~2',
+    `last12MonthNegativeCount` bigint(20) NOT NULL COMMENT 'negativelCount : count from 1~2',
+    `last7DaysTotalCount` bigint(20) NOT NULL COMMENT 'last7DaysTotalCount for customer_feedback',
+    `lastMonthTotalCount` bigint(20) NOT NULL COMMENT 'lastMonthTotalCount for customer_feedback',
+    `last3MonthTotalCount` bigint(20) NOT NULL COMMENT 'last3MonthTotalCount for customer_feedback',
+    `last12MonthTotalCount` bigint(20) NOT NULL COMMENT 'last12MonthTotalCount for customer_feedback',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`id`,`rateDate`),
+    UNIQUE KEY `customer_feedback_history_uk01` (`vendorId`,`rateDate`),
+    KEY `customer_feedback_history_idx01` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors'
+    /*!50500 PARTITION BY RANGE COLUMNS(rateDate)
+    (PARTITION p201609 VALUES LESS THAN ('2016-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201610 VALUES LESS THAN ('2016-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201611 VALUES LESS THAN ('2016-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201612 VALUES LESS THAN ('2017-01-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201701 VALUES LESS THAN ('2017-02-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201702 VALUES LESS THAN ('2017-03-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201703 VALUES LESS THAN ('2017-04-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201704 VALUES LESS THAN ('2017-05-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201705 VALUES LESS THAN ('2017-06-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201706 VALUES LESS THAN ('2017-07-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201707 VALUES LESS THAN ('2017-08-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201708 VALUES LESS THAN ('2017-09-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201709 VALUES LESS THAN ('2017-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201710 VALUES LESS THAN ('2017-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201711 VALUES LESS THAN ('2017-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201712 VALUES LESS THAN ('2018-01-01 00:00:00') ENGINE = InnoDB) */
+    ;
+
+    CREATE TABLE `seller_rating`.`inquiry_response_history` (
+    `inquiryResponseHistoryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for customer_feedback',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for inquiry_response',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for inquiry_response',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for inquiry_response',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for inquiry_response',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    `totalInquiryCount` BIGINT(20) DEFAULT 0 COMMENT 'Total inquiry count',
+    `onTimeResponseCount` BIGINT(20) DEFAULT 0 COMMENT 'Total inquiry count that responded in 24 hours (need response)',
+    `last7DaysTotalInquiryCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count int late 7 days',
+    `last7DaysOnTimeResponseCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count that responded in 24 hours (need response) int last 7 days',
+    `lastMonthTotalInquiryCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count int late 30 days',
+    `lastMonthOnTimeResponseCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count that responded in 24 hours (need response) int last 30 days',
+    `last3MonthsTotalInquiryCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count int late 90 days',
+    `last3MonthsOnTimeResponseCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count that responded in 24 hours (need response) int last 90 days',
+    `last12MonthsTotalInquiryCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count int late 365 days',
+    `last12MonthsOnTimeResponseCount` BIGINT(20) DEFAULT 0 COMMENT 'Inquiry count that responded in 24 hours (need response) int last 365 days',
+    PRIMARY KEY (`inquiryResponseHistoryId`,`rateDate`),
+    UNIQUE KEY `uk_vendorId_rateDate` (`vendorId`,`rateDate`),
+    KEY `inquiry_response_history_idx01` (`modifiedAt`),
+    KEY `inquiry_response_history_idx02` (`createdAt`)
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors';
+    we want delete access for this table, cause they store data of history, we tend to store at most 3 months, otherwise we will do delete to avoid too much data.
+
+
+    ALTER TABLE `seller_rating`.`lateshipment_history`
+    ADD COLUMN `numerator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of total',
+    ADD COLUMN `denominator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of total',
+    ADD COLUMN `last7DaysNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 7 days',
+    ADD COLUMN `last7DaysDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 7 days',
+    ADD COLUMN `lastMonthNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last month',
+    ADD COLUMN `lastMonthDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last month',
+    ADD COLUMN `last3MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 3 month(90days)',
+    ADD COLUMN `last3MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 3 month(90days)',
+    ADD COLUMN `last12MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 12 month(365days)',
+    ADD COLUMN `last12MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 12 month(365days)';
+    Create sql for this table:
+    CREATE TABLE `seller_rating`.`lateshipment_history` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for lateshipment',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for lateshipment',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for lateshipment',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for lateshipment',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for lateshipment',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`id`,`rateDate`),
+    UNIQUE KEY `lateshipment_history_uk01` (`vendorId`,`rateDate`),
+    KEY `lateshipment_history_idx01` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors'
+    /*!50500 PARTITION BY RANGE COLUMNS(rateDate)
+    (PARTITION p201609 VALUES LESS THAN ('2016-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201610 VALUES LESS THAN ('2016-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201611 VALUES LESS THAN ('2016-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201612 VALUES LESS THAN ('2017-01-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201701 VALUES LESS THAN ('2017-02-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201702 VALUES LESS THAN ('2017-03-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201703 VALUES LESS THAN ('2017-04-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201704 VALUES LESS THAN ('2017-05-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201705 VALUES LESS THAN ('2017-06-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201706 VALUES LESS THAN ('2017-07-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201707 VALUES LESS THAN ('2017-08-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201708 VALUES LESS THAN ('2017-09-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201709 VALUES LESS THAN ('2017-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201710 VALUES LESS THAN ('2017-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201711 VALUES LESS THAN ('2017-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201712 VALUES LESS THAN ('2018-01-01 00:00:00') ENGINE = InnoDB) */
+    ;
+
+    ALTER TABLE `seller_rating`.`ontimedelivery_history`
+    ADD COLUMN `numerator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of total',
+    ADD COLUMN `denominator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of total',
+    ADD COLUMN `last7DaysNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 7 days',
+    ADD COLUMN `last7DaysDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 7 days',
+    ADD COLUMN `lastMonthNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last month',
+    ADD COLUMN `lastMonthDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last month',
+    ADD COLUMN `last3MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 3 month(90days)',
+    ADD COLUMN `last3MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 3 month(90days)',
+    ADD COLUMN `last12MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 12 month(365days)',
+    ADD COLUMN `last12MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 12 month(365days)';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`ontimedelivery_history` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `vendorId` varchar(255) NOT NULL COMMENT 'vendor id',
+    `rateDate` date NOT NULL COMMENT 'rate date for factor of all tables(format:yyyy-mm-dd)',
+    `rate` decimal(7,6) NOT NULL COMMENT 'rate for ontimedelivery',
+    `last7DaysRate` decimal(7,6) NOT NULL COMMENT 'last7DaysRate for ontimedelivery',
+    `lastMonthRate` decimal(7,6) NOT NULL COMMENT 'lastMonthRate for ontimedelivery',
+    `last3MonthRate` decimal(7,6) NOT NULL COMMENT 'last3MonthRate for ontimedelivery',
+    `last12MonthRate` decimal(7,6) NOT NULL COMMENT 'last12MonthRate for ontimedelivery',
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`id`,`rateDate`),
+    UNIQUE KEY `ontimedelivery_history_uk01` (`vendorId`,`rateDate`),
+    KEY `ontimedelivery_history_idx01` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table is used to store history rate for factors'
+    /*!50500 PARTITION BY RANGE COLUMNS(rateDate)
+    (PARTITION p201609 VALUES LESS THAN ('2016-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201610 VALUES LESS THAN ('2016-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201611 VALUES LESS THAN ('2016-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201612 VALUES LESS THAN ('2017-01-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201701 VALUES LESS THAN ('2017-02-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201702 VALUES LESS THAN ('2017-03-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201703 VALUES LESS THAN ('2017-04-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201704 VALUES LESS THAN ('2017-05-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201705 VALUES LESS THAN ('2017-06-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201706 VALUES LESS THAN ('2017-07-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201707 VALUES LESS THAN ('2017-08-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201708 VALUES LESS THAN ('2017-09-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201709 VALUES LESS THAN ('2017-10-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201710 VALUES LESS THAN ('2017-11-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201711 VALUES LESS THAN ('2017-12-01 00:00:00') ENGINE = InnoDB,
+    PARTITION p201712 VALUES LESS THAN ('2018-01-01 00:00:00') ENGINE = InnoDB) */
+    ;
+
+
+    ALTER TABLE `seller_rating`.`cancellation_rate`
+    ADD COLUMN `status` varchar(20) comment 'factor current status',
+    ADD COLUMN `statusChangeDate` date comment 'last status change datetime',
+    ADD COLUMN `cautionRate` decimal(7,6) comment 'the last 30 days rate of day which last time factor turn yellow from green';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`cancellation_rate` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `vendorId` varchar(255) NOT NULL,
+    `last12MonthsRate` double NOT NULL,
+    `last3MonthsRate` double NOT NULL,
+    `last7DaysRate` double NOT NULL,
+    `lastMonthRate` double NOT NULL,
+    `rate` double NOT NULL,
+    `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `isEmpty` tinyint(1) NOT NULL DEFAULT '0',
+    `rateParamA` double DEFAULT '0',
+    `rateParamB` double DEFAULT '0',
+    `last7DaysRateParamA` double DEFAULT '0',
+    `last7DaysRateParamB` double DEFAULT '0',
+    `lastMonthRateParamA` double DEFAULT '0',
+    `lastMonthRateParamB` double DEFAULT '0',
+    `last3MonthsRateParamA` double DEFAULT '0',
+    `last3MonthsRateParamB` double DEFAULT '0',
+    `last12MonthsRateParamA` double DEFAULT '0',
+    `last12MonthsRateParamB` double DEFAULT '0',
+    `modifiedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `cancellation_rate_uk01` (`vendorId`),
+    KEY `cancellation_rate_idx01` (`createdAt`),
+    KEY `cancellation_rate_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+    ALTER TABLE `seller_rating`.`inquiry_response_rate`
+    ADD COLUMN `status` varchar(20) comment 'factor current status',
+    ADD COLUMN `statusChangeDate` date comment 'last status change datetime',
+    ADD COLUMN `cautionRate` decimal(7,6) comment 'the last 30 days rate of day which last time factor turn yellow from green';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`inquiry_response_rate` (
+    `inquiry_response_rate_id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `vendorId` varchar(255) NOT NULL,
+    `last12MonthsRate` double NOT NULL,
+    `last3MonthsRate` double NOT NULL,
+    `last7DaysRate` double NOT NULL,
+    `lastMonthRate` double NOT NULL,
+    `rate` double NOT NULL,
+    `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `modifiedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+    `isEmpty` tinyint(1) NOT NULL DEFAULT '0',
+    `rateParamA` double DEFAULT '0',
+    `rateParamB` double DEFAULT '0',
+    `rateParamC` double DEFAULT '0',
+    `rateParamD` double DEFAULT '0',
+    `last7DaysRateParamA` double DEFAULT '0',
+    `last7DaysRateParamB` double DEFAULT '0',
+    `last7DaysRateParamC` double DEFAULT '0',
+    `last7DaysRateParamD` double DEFAULT '0',
+    `lastMonthRateParamA` double DEFAULT '0',
+    `lastMonthRateParamB` double DEFAULT '0',
+    `lastMonthRateParamC` double DEFAULT '0',
+    `lastMonthRateParamD` double DEFAULT '0',
+    `last3MonthsRateParamA` double DEFAULT '0',
+    `last3MonthsRateParamB` double DEFAULT '0',
+    `last3MonthsRateParamC` double DEFAULT '0',
+    `last3MonthsRateParamD` double DEFAULT '0',
+    `last12MonthsRateParamA` double DEFAULT '0',
+    `last12MonthsRateParamB` double DEFAULT '0',
+    `last12MonthsRateParamC` double DEFAULT '0',
+    `last12MonthsRateParamD` double DEFAULT '0',
+    PRIMARY KEY (`inquiry_response_rate_id`),
+    UNIQUE KEY `inquiry_response_rate_id_uk01` (`vendorId`),
+    KEY `inquiry_response_rate_idx01` (`createdAt`),
+    KEY `inquiry_response_rate_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=7648 DEFAULT CHARSET=utf8;
+
+
+    ALTER TABLE `seller_rating`.`late_shipment_rate`
+    ADD COLUMN `status` varchar(20) comment 'factor current status',
+    ADD COLUMN `statusChangeDate` date comment 'last status change datetime',
+    ADD COLUMN `cautionRate` decimal(7,6) comment 'the last 30 days rate of day which last time factor turn yellow from green';
+    create sql for this table:
+    CREATE TABLE `seller_rating`.`late_shipment_rate` (
+    `late_shipment_rate_id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `vendorId` varchar(20) NOT NULL,
+    `last12MonthsRate` double NOT NULL,
+    `last3MonthsRate` double NOT NULL,
+    `last7DaysRate` double NOT NULL,
+    `lastMonthRate` double NOT NULL,
+    `rate` double NOT NULL,
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    `numerator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of total',
+    `denominator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of total',
+    `last7DaysNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 7 days',
+    `last7DaysDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 7 days',
+    `lastMonthNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last month',
+    `lastMonthDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last month',
+    `last3MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 3 month(90days)',
+    `last3MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 3 month(90days)',
+    `last12MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 12 month(365days)',
+    `last12MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 12 month(365days)',
+    PRIMARY KEY (`late_shipment_rate_id`),
+    UNIQUE KEY `late_shipment_rate_uk01` (`vendorId`),
+    KEY `late_shipment_rate_idx01` (`createdAt`),
+    KEY `late_shipment_rate_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+    ALTER TABLE `seller_rating`.`ontime_delivery_rate`
+    ADD COLUMN `status` varchar(20) comment 'factor current status',
+    ADD COLUMN `statusChangeDate` date comment 'last status change datetime',
+    ADD COLUMN `cautionRate` decimal(7,6) comment 'the last 30 days rate of day which last time factor turn yellow from green';
+    create sql for this table:
+    CREATE TABLE `ontime_delivery_rate` (
+    `ontime_delivery_rate_id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `vendorId` varchar(20) NOT NULL,
+    `last12MonthsRate` double NOT NULL,
+    `last3MonthsRate` double NOT NULL,
+    `last7DaysRate` double NOT NULL,
+    `lastMonthRate` double NOT NULL,
+    `rate` double NOT NULL,
+    `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    `numerator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of total',
+    `denominator` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of total',
+    `last7DaysNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 7 days',
+    `last7DaysDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 7 days',
+    `lastMonthNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last month',
+    `lastMonthDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last month',
+    `last3MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 3 month(90days)',
+    `last3MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 3 month(90days)',
+    `last12MonthsNum` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'numerator of last 12 month(365days)',
+    `last12MonthsDen` BIGINT(20) NOT NULL DEFAULT 0 COMMENT 'denominator of last 12 month(365days)',
+    PRIMARY KEY (`ontime_delivery_rate_id`),
+    UNIQUE KEY `ontime_delivery_rate_uk01` (`vendorId`),
+    KEY `ontime_delivery_rate_idx01` (`createdAt`),
+    KEY `ontime_delivery_rate_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+    ALTER TABLE `seller_rating`.`seller_rating`
+    ADD COLUMN `probation_count` int comment 'times of probation',
+    ADD COLUMN `first_probation_date` date comment 'first probation date',
+    ADD COLUMN `probation_release_date` date comment 'probation release date';
+    create sql for this table:
+    CREATE TABLE `seller_rating` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `vendorId` varchar(255) NOT NULL,
+    `last12MonthsRate` double NOT NULL,
+    `last3MonthsRate` double NOT NULL,
+    `last7DaysRate` double NOT NULL,
+    `lastMonthRate` double NOT NULL,
+    `rate` double NOT NULL,
+    `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `totalOrders` bigint(20) NOT NULL,
+    `modifiedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `seller_rating_uk01` (`vendorId`),
+    KEY `seller_rating_idx01` (`createdAt`),
+    KEY `seller_rating_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+    CREATE TABLE `seller_rating`.`factor_status_change_history` (
+    `factorStatusChangeHistoryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'primary key, auto increase id',
+    `factorName` varchar(50) NOT NULL COMMENT 'factor name',
+    `statusBefore` varchar(20) NOT NULL COMMENT 'status before change',
+    `statusAfter` varchar(20) NOT NULL COMMENT 'status after change',
+    `createdAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record created date time',
+    `modifiedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT 'record last updated date time',
+    PRIMARY KEY (`factorStatusChangeHistoryId`,`createdAt`),
+    KEY `factor_status_change_history_idx01` (`createdAt`),
+    KEY `factor_status_change_history_idx02` (`modifiedAt`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='this table store factor status change history';
+    we want delete access for this table, cause they store data of history, we tend to store at most 1 year data, otherwise we will do delete to avoid too much data.
+
+
+    5. Relationship with existing tables
+    No
+
+    6. DML, SELECT queries needed to run the service
+
+    1)SELECT
+    SELECT * FROM `seller_rating`.`cancellation_history`
+    WHERE `cancellation_history`.`vendorId` = '?' AND `cancellation_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`deliverynps_history`
+    WHERE `deliverynps_history`.`vendorId` = '?' AND `deliverynps_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`customer_feedback_history`
+    WHERE `customer_feedback_history`.`vendorId` = '?' AND `customer_feedback_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`inquiry_response_history`
+    WHERE `inquiry_response_history`.`vendorId` = '?' AND `inquiry_response_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`lateshipment_history`
+    WHERE `lateshipment_history`.`vendorId` = '?' AND `lateshipment_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`ontimedelivery_history`
+    WHERE `ontimedelivery_history`.`vendorId` = '?' AND `ontimedelivery_history`.`rateDate` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`cancellation_rate` where `cancellation_rate`.`vendorId` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`inquiry_response_rate` where `inquiry_response_rate`.`vendorId` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`late_shipment_rate` where `late_shipment_rate`.`vendorId` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`ontime_delivery_rate` where `ontime_delivery_rate`.`vendorId` = '?'; -- Mandatory
+    SELECT * FROM `seller_rating`.`seller_rating` where `seller_rating`.`vendorId` = '?'; -- Mandatory
+
+
+
+    2)INSERT
+    INSERT INTO `seller_rating`.`cancellation_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`cancelUnit`,`soldUnit`,`last7DaysCancelUnit`,
+    `last7DaysSoldUnit`,`lastMonthCancelUnit`,`lastMonthSoldUnit`,
+    `last3MonthCancelUnit`,`last3MonthSoldUnit`,`last12MonthCancelUnit`,
+    `last12MonthSoldUnit`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`deliverynps_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`customer_feedback_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`inquiry_response_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`totalInquiryCount`,`onTimeResponseCount`,`last7DaysTotalInquiryCount`,
+    `last7DaysOnTimeResponseCount`,`lastMonthTotalInquiryCount`,`lastMonthOnTimeResponseCount`,
+    `last3MonthsTotalInquiryCount`,`last3MonthsOnTimeResponseCount`,`last12MonthsTotalInquiryCount`,
+    `last12MonthsOnTimeResponseCount`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`lateshipment_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`ontimedelivery_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,
+    `last12MonthsDen`)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`cancellation_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,`lastMonthRate`,`rate`,
+    `createdAt`,`isEmpty`,`rateParamA`,`rateParamB`,`last7DaysRateParamA`,`last7DaysRateParamB`,
+    `lastMonthRateParamA`,`lastMonthRateParamB`,`last3MonthsRateParamA`,`last3MonthsRateParamB`,
+    `last12MonthsRateParamA`,`last12MonthsRateParamB`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`inquiry_response_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`isEmpty`,`rateParamA`,`rateParamB`,`rateParamC`,
+    `rateParamD`,`last7DaysRateParamA`,`last7DaysRateParamB`,`last7DaysRateParamC`,`last7DaysRateParamD`,
+    `lastMonthRateParamA`,`lastMonthRateParamB`,`lastMonthRateParamC`,`lastMonthRateParamD`,
+    `last3MonthsRateParamA`,`last3MonthsRateParamB`,`last3MonthsRateParamC`,`last3MonthsRateParamD`,
+    `last12MonthsRateParamA`,`last12MonthsRateParamB`,`last12MonthsRateParamC`,`last12MonthsRateParamD`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`late_shipment_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,
+    `last7DaysRate`,`lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`,`last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES
+    (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`ontime_delivery_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,
+    `last7DaysRate`,`lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`,`last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES
+    (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`seller_rating`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`totalOrders`,`modifiedAt`,`probation_count`,`first_probation_date`,`probation_release_date`)
+    VALUES
+    (?,?,?,?,?,?,?,?,?,?,?,?);
+    INSERT INTO `seller_rating`.`factor_status_change_history`
+    (`factorName`,`statusBefore`,`statusAfter`,`createdAt`,`modifiedAt`)
+    VALUES
+    (?,?,?,?,?);
+
+
+
+    3)UPDATE
+    UPDATE `seller_rating`.`cancellation_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`cancelUnit` = ? ,`soldUnit` = ? ,
+    `last7DaysCancelUnit` = ? ,`last7DaysSoldUnit` = ? ,
+    `lastMonthCancelUnit` = ? , `lastMonthSoldUnit` = ?,
+    `last3MonthCancelUnit` = ?, `last3MonthSoldUnit` = ?,
+    `last12MonthCancelUnit` = ?,`last12MonthSoldUnit` = ?,
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+    UPDATE `seller_rating`.`deliverynps_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`positiveCount` = ?,`neutralCount` = ?,`negativeCount` = ?,`totalCount` = ?,
+    `last7DaysPositiveCount` = ?,`last7DaysNeutralCount` = ?,`last7DaysNegativeCount` = ?,`last7DaysTotalCount` = ?,
+    `lastMonthPositiveCount` = ?,`lastMonthNeutralCount` = ? ,`lastMonthNegativeCount` = ? ,
+    `lastMonthTotalCount` = ? ,`last3MonthPositiveCount` = ? ,`last3MonthNeutralCount` = ? ,
+    `last3MonthNegativeCount` = ? ,`last3MonthTotalCount` = ? ,`last12MonthPositiveCount` = ? ,
+    `last12MonthNeutralCount` = ? ,`last12MonthNegativeCount` = ? ,`last12MonthTotalCount` = ?
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+    UPDATE `seller_rating`.`customer_feedback_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`positiveCount` = ?,`neutralCount` = ?,`negativeCount` = ?,`totalCount` = ?,
+    `last7DaysPositiveCount` = ?,`last7DaysNeutralCount` = ?,`last7DaysNegativeCount` = ?,`last7DaysTotalCount` = ?,
+    `lastMonthPositiveCount` = ?,`lastMonthNeutralCount` = ? ,`lastMonthNegativeCount` = ? ,
+    `lastMonthTotalCount` = ? ,`last3MonthPositiveCount` = ? ,`last3MonthNeutralCount` = ? ,
+    `last3MonthNegativeCount` = ? ,`last3MonthTotalCount` = ? ,`last12MonthPositiveCount` = ? ,
+    `last12MonthNeutralCount` = ? ,`last12MonthNegativeCount` = ? ,`last12MonthTotalCount` = ?
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+    UPDATE `seller_rating`.`inquiry_response_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`totalInquiryCount` = ? ,`onTimeResponseCount` = ? ,
+    `last7DaysTotalInquiryCount` = ? ,`last7DaysOnTimeResponseCount` = ? ,
+    `lastMonthTotalInquiryCount` = ? , `lastMonthOnTimeResponseCount` = ?,
+    `last3MonthsTotalInquiryCount` = ?, `last3MonthsOnTimeResponseCount` = ?,
+    `last12MonthsTotalInquiryCount` = ?,`last12MonthsOnTimeResponseCount` = ?,
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+    UPDATE `seller_rating`.`lateshipment_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`numerator` = ?,`denominator` = ?,`last7DaysNum` = ?,`last7DaysDen` = ?,
+    `lastMonthNum` = ?,`lastMonthDen` = ?,`last3MonthsNum` = ?,`last3MonthsDen` = ?,
+    `last12MonthsNum` = ?,`last12MonthsDen` = ?
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+    UPDATE `seller_rating`.`ontimedelivery_history`
+    SET
+    `last12MonthRate` = ?,`last3MonthRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`numerator` = ?,`denominator` = ?,`last7DaysNum` = ?,`last7DaysDen` = ?,
+    `lastMonthNum` = ?,`lastMonthDen` = ?,`last3MonthsNum` = ?,`last3MonthsDen` = ?,
+    `last12MonthsNum` = ?,`last12MonthsDen` = ?
+    WHERE `vendorId` = ? AND `rateDate` = ?;
+
+    UPDATE `seller_rating`.`cancellation_rate`
+    SET
+    `last12MonthsRate` = ?,`last3MonthsRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`rateParamA` = ?,`last7DaysRateParamA` = ?,`lastMonthRateParamA` = ?,
+    `last3MonthsRateParamA` = ?,`last12MonthsRateParamA` = ?,`modifiedAt` = ?,
+    `status` = ?, `statusChangeDate` = ?, `cautionRate` = ?
+    WHERE `vendorId` = ?;
+
+    UPDATE `seller_rating`.`inquiry_response_rate`
+    SET
+    `last12MonthsRate` = ?,`last3MonthsRate` = ?,`last7DaysRate` = ?,`lastMonthRate` = ?,
+    `rate` = ?,`modifiedAt` = ?,`rateParamA` = ?,`rateParamB` = ?,`last7DaysRateParamA` = ?,
+    `last7DaysRateParamB` = ?,`lastMonthRateParamA` = ?,`lastMonthRateParamB` = ?,
+    `last3MonthsRateParamA` = ?,`last3MonthsRateParamB` = ?,`last12MonthsRateParamA` = ?,
+    `last12MonthsRateParamB` = ?, `status` = ?, `statusChangeDate` = ?, `cautionRate` = ?
+    WHERE `vendorId` = ?;
+
+    UPDATE `seller_rating`.`late_shipment_rate`
+    SET
+    `last12MonthsRate` = ?,`last3MonthsRate` = ?,`last7DaysRate` = ?,
+    `lastMonthRate` = ?,`rate` = ?,`modifiedAt` = ?,
+    `status` = ?, `statusChangeDate` = ?, `cautionRate` = ?,
+    `numerator` = ?,`denominator` = ?, `last7DaysNum` = ?,`last7DaysDen` = ?, `lastMonthNum` = ?,
+    `lastMonthDen` = ?,`last3MonthsNum` = ?, `last3MonthsDen` = ?, `last12MonthsNum` = ?, `last12MonthsDen` = ?
+    WHERE `vendorId` = ?;
+
+    UPDATE `seller_rating`.`ontime_delivery_rate`
+    SET
+    `last12MonthsRate` = ?,`last3MonthsRate` = ?,`last7DaysRate` = ?,
+    `lastMonthRate` = ?,`rate` = ?,`modifiedAt` = ?,
+    `status` = ?, `statusChangeDate` = ?, `cautionRate` = ?,
+    `numerator` = ?,`denominator` = ?, `last7DaysNum` = ?,`last7DaysDen` = ?, `lastMonthNum` = ?,
+    `lastMonthDen` = ?,`last3MonthsNum` = ?, `last3MonthsDen` = ?, `last12MonthsNum` = ?, `last12MonthsDen` = ?
+    WHERE `vendorId` = ?;
+
+    UPDATE `seller_rating`.`seller_rating`
+    SET
+    `last12MonthsRate` = ?,`last3MonthsRate` = ?,`last7DaysRate` = ?,
+    `lastMonthRate` = ?,`rate` = ?,`totalOrders` = ?,`modifiedAt` = ?,
+    `probation_count` = ?, `first_probation_date` = ?, `probation_release_date` = ?
+    WHERE `vendorId` = ?;
+
+
+
+
+    7. Sample row value (at least 3 rows, INSERT statement)
+    INSERT INTO `seller_rating`.`cancellation_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`cancelUnit`,`soldUnit`,`last7DaysCancelUnit`,
+    `last7DaysSoldUnit`,`lastMonthCancelUnit`,`lastMonthSoldUnit`,
+    `last3MonthCancelUnit`,`last3MonthSoldUnit`,`last12MonthCancelUnit`,
+    `last12MonthSoldUnit`)
+    VALUES ('A00010028','2016-11-11',1,1,1,1,1,sysdate(),sysdate(),2,3,2,3,2,3,2,3,2,3);
+
+    INSERT INTO `seller_rating`.`cancellation_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`cancelUnit`,`soldUnit`,`last7DaysCancelUnit`,
+    `last7DaysSoldUnit`,`lastMonthCancelUnit`,`lastMonthSoldUnit`,
+    `last3MonthCancelUnit`,`last3MonthSoldUnit`,`last12MonthCancelUnit`,
+    `last12MonthSoldUnit`)
+    VALUES ('A00010028','2016-11-12',0,0,0,0,0,sysdate(),sysdate(),4,4,4,4,4,4,4,4,4,4);
+
+    INSERT INTO `seller_rating`.`deliverynps_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES ('A00010028','2016-11-11',1,1,1,1,1,sysdate(),sysdate(),1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4);
+
+    INSERT INTO `seller_rating`.`deliverynps_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES ('A00010028','2016-11-12',0,0,0,0,0,sysdate(),sysdate(),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+    INSERT INTO `seller_rating`.`customer_feedback_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES ('A00010028','2016-11-11',1,1,1,1,1,sysdate(),sysdate(),1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4);
+
+    INSERT INTO `seller_rating`.`customer_feedback_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`positiveCount`,`neutralCount`,`negativeCount`,
+    `totalCount`,`last7DaysPositiveCount`,`last7DaysNeutralCount`,`last7DaysNegativeCount`,
+    `last7DaysTotalCount`,`lastMonthPositiveCount`,`lastMonthNeutralCount`,`lastMonthNegativeCount`,
+    `lastMonthTotalCount`,`last3MonthPositiveCount`,`last3MonthNeutralCount`,`last3MonthNegativeCount`,
+    `last3MonthTotalCount`,`last12MonthPositiveCount`,`last12MonthNeutralCount`,
+    `last12MonthNegativeCount`,`last12MonthTotalCount`)
+    VALUES ('A00010028','2016-11-12',0,0,0,0,0,sysdate(),sysdate(),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+
+
+    INSERT INTO `seller_rating`.`lateshipment_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES ('A00100888','2016-12-12', '1', '1', '1', '1', '0',sysdate(),sysdate(), '0', '1', '1', '1', '1', '1', '1', '1', '1', '1');
+
+    INSERT INTO `seller_rating`.`lateshipment_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES ('A00100888','2016-11-11', '0.5', '0.5', '0.5', '0.5', '0.5',sysdate(),sysdate(), '2', '3', '4', '5', '6', '7', '8', '9', '10', '11');
+
+    INSERT INTO `seller_rating`.`ontimedelivery_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES ('A00100888','2016-11-11' , '1', '1', '1', '1', '0',sysdate(),sysdate(), '0', '1', '1', '1', '1', '1', '1', '1', '1', '1');
+
+    INSERT INTO `seller_rating`.`ontimedelivery_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`numerator`,`denominator`,
+    `last7DaysNum`,`last7DaysDen`,`lastMonthNum`,`lastMonthDen`,`last3MonthsNum`,
+    `last3MonthsDen`,`last12MonthsNum`,`last12MonthsDen`)
+    VALUES ('A00100888','2016-12-12', '0.5', '0.5', '0.5', '0.5', '0.5',sysdate(),sysdate(), '2', '3', '4', '5', '6', '7', '8', '9', '10', '11');
+
+    INSERT INTO `seller_rating`.`inquiry_response_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`totalInquiryCount`,`onTimeResponseCount`,`last7DaysTotalInquiryCount`,
+    `last7DaysOnTimeResponseCount`,`lastMonthTotalInquiryCount`,`lastMonthOnTimeResponseCount`,
+    `last3MonthsTotalInquiryCount`,`last3MonthsOnTimeResponseCount`,
+    `last12MonthsTotalInquiryCount`,`last12MonthsOnTimeResponseCount`)
+    VALUES ('A00100888','2016-11-11' , '1', '1', '1', '1', '0',sysdate(),sysdate(), '0', '1', '1', '1', '1', '1', '1', '1', '1', '1');
+
+    INSERT INTO `seller_rating`.`inquiry_response_history`
+    (`vendorId`,`rateDate`,`last12MonthRate`,`last3MonthRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`modifiedAt`,`totalInquiryCount`,`onTimeResponseCount`,`last7DaysTotalInquiryCount`,
+    `last7DaysOnTimeResponseCount`,`lastMonthTotalInquiryCount`,`lastMonthOnTimeResponseCount`,
+    `last3MonthsTotalInquiryCount`,`last3MonthsOnTimeResponseCount`,
+    `last12MonthsTotalInquiryCount`,`last12MonthsOnTimeResponseCount`)
+    VALUES ('A00100888','2016-11-12' , '1', '1', '1', '1', '0',sysdate(),sysdate(), '1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
+
+    INSERT INTO `seller_rating`.`cancellation_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`isEmpty`,`rateParamA`,`rateParamB`,`last7DaysRateParamA`,
+    `last7DaysRateParamB`,`lastMonthRateParamA`,`lastMonthRateParamB`,`last3MonthsRateParamA`,
+    `last3MonthsRateParamB`,`last12MonthsRateParamA`,`last12MonthsRateParamB`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    ('A00100888',0.5,0.5,0.5,0.5,0.5,sysdate(),1,10,20,10,20,10,20,10,20,10,20,sysdate(),'Green',sysdate(),0.8);
+
+    INSERT INTO `seller_rating`.`cancellation_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,`lastMonthRate`,
+    `rate`,`createdAt`,`isEmpty`,`rateParamA`,`rateParamB`,`last7DaysRateParamA`,
+    `last7DaysRateParamB`,`lastMonthRateParamA`,`lastMonthRateParamB`,`last3MonthsRateParamA`,
+    `last3MonthsRateParamB`,`last12MonthsRateParamA`,`last12MonthsRateParamB`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    ('A00100888',1,1,1,1,1,sysdate(),1,10,10,10,10,10,10,10,10,10,10,sysdate(),'Red',sysdate(),0.5);
+
+    INSERT INTO `seller_rating`.`inquiry_response_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,`lastMonthRate`,`rate`,`createdAt`,
+    `modifiedAt`,`isEmpty`,`rateParamA`,`rateParamB`,`last7DaysRateParamA`,`last7DaysRateParamB`,
+    `lastMonthRateParamA`,`lastMonthRateParamB`,`last3MonthsRateParamA`,`last3MonthsRateParamB`,
+    `last12MonthsRateParamA`,`last12MonthsRateParamB`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    ('A00100888',0.5,0.5,0.5,0.5,0.5,sysdate(),sysdate(),1,10,20,10,20,10,20,10,20,10,20,'Green',sysdate(),0.8);
+
+    INSERT INTO `seller_rating`.`inquiry_response_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,`lastMonthRate`,`rate`,`createdAt`,
+    `modifiedAt`,`isEmpty`,`rateParamA`,`rateParamB`,`last7DaysRateParamA`,`last7DaysRateParamB`,
+    `lastMonthRateParamA`,`lastMonthRateParamB`,`last3MonthsRateParamA`,`last3MonthsRateParamB`,
+    `last12MonthsRateParamA`,`last12MonthsRateParamB`,`status`,`statusChangeDate`,`cautionRate`)
+    VALUES
+    ('A00100888',1,1,1,1,1,sysdate(),sysdate(),1,10,10,10,10,10,10,10,10,10,10,'Red',sysdate(),0.5);
+
+    INSERT INTO `seller_rating`.`late_shipment_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`, `last7DaysNum`,`last7DaysDen`, `lastMonthNum`,
+    `lastMonthDen`,`last3MonthsNum`, `last3MonthsDen`, `last12MonthsNum`, `last12MonthsDen`)
+    VALUES
+    ('A00100888',0.5,0.5,0.5,0.5,0.5,sysdate(),sysdate(),'Green',sysdate(),0.8,10,20,10,20,10,20,10,20,10,20);
+
+    INSERT INTO `seller_rating`.`late_shipment_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`, `last7DaysNum`,`last7DaysDen`, `lastMonthNum`,
+    `lastMonthDen`,`last3MonthsNum`, `last3MonthsDen`, `last12MonthsNum`, `last12MonthsDen`)
+    VALUES
+    ('A00100888',1,1,1,1,1,sysdate(),sysdate(),'Red',sysdate(),0.5,10,10,10,10,10,10,10,10,10,10);
+
+    INSERT INTO `seller_rating`.`ontime_delivery_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`, `last7DaysNum`,`last7DaysDen`, `lastMonthNum`,
+    `lastMonthDen`,`last3MonthsNum`, `last3MonthsDen`, `last12MonthsNum`, `last12MonthsDen`)
+    VALUES
+    ('A00100888',0.5,0.5,0.5,0.5,0.5,sysdate(),sysdate(),'Green',sysdate(),0.8,10,20,10,20,10,20,10,20,10,20);
+
+    INSERT INTO `seller_rating`.`ontime_delivery_rate`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`modifiedAt`,`status`,`statusChangeDate`,`cautionRate`,
+    `numerator`,`denominator`, `last7DaysNum`,`last7DaysDen`, `lastMonthNum`,
+    `lastMonthDen`,`last3MonthsNum`, `last3MonthsDen`, `last12MonthsNum`, `last12MonthsDen`)
+    VALUES
+    ('A00100888',1,1,1,1,1,sysdate(),sysdate(),'Red',sysdate(),0.5,10,10,10,10,10,10,10,10,10,10);
+
+    INSERT INTO `seller_rating`.`seller_rating`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`totalOrders`,`modifiedAt`,`probation_count`,`first_probation_date`,`probation_release_date`)
+    VALUES
+    ('A00100888',0.5,0.5,0.5,0.5,0.5,sysdate(),100,sysdate(),1,'2016-11-11','2016-11-18');
+
+    INSERT INTO `seller_rating`.`seller_rating`
+    (`vendorId`,`last12MonthsRate`,`last3MonthsRate`,`last7DaysRate`,
+    `lastMonthRate`,`rate`,`createdAt`,`totalOrders`,`modifiedAt`,`first_probation_date`,`probation_release_date`)
+    VALUES
+    ('A00100888',1,1,1,1,1,sysdate(),100,sysdate(),2,'2016-10-11','2016-11-02');
+
+    INSERT INTO `seller_rating`.`factor_status_change_history`
+    (`factorName`,`statusBefore`,`statusAfter`,`createdAt`,`modifiedAt`)
+    VALUES
+    ('SR_FACTOR_CANCELLATION','Green','Yellow',sysdate(),sysdate());
+
+    INSERT INTO `seller_rating`.`factor_status_change_history`
+    (`factorName`,`statusBefore`,`statusAfter`,`createdAt`,`modifiedAt`)
+    VALUES
+    ('SR_FACTOR_INQUIRY_RESPONSE','Yellow','Red',sysdate(),sysdate());
+
+
